@@ -1,2 +1,14 @@
-# ProyectoUNIR_IA
-Chat académico desarrollado para estudiantes de UNIR, diseñado para resolver dudas en tiempo real sobre materias, tareas y recursos educativos. Facilita la comunicación entre alumnos y tutores de forma rápida y sencilla.
+# Chat de Dudas Académicas - UNIR
+
+Este proyecto es un chat diseñado para resolver dudas académicas entre estudiantes y tutores de UNIR, facilitando la comunicación en tiempo real.
+
+## 📦 Instalación
+
+El comando para inicializar un proyecto Node.js es:
+
+npm init
+
+Para instalar las dependencias del proyecto, ejecuta el siguiente comando:
+
+```bash
+npm install
