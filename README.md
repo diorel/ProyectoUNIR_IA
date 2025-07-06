@@ -32,4 +32,8 @@ ve a la pagina:
 http://localhost:3000/
 ```
 
-para usar ollama
+para usar ollama agrega el query param `?llm=llama`
+
+```
+ http://localhost:3000/?llm=llama
+```
