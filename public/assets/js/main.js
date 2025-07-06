@@ -48,6 +48,7 @@ const sendMessage = async () => {
 
     messagesContainer.innerHTML += `<div class="chat__message chat__message--user">Yo: ${inputText}</div>`;
     inputElement.value = '';
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
     if (urlParams.get('llm') === 'llama') {
         llmResponse = await llamaApi(inputText);
