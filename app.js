@@ -2,6 +2,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
+import ollama from 'ollama'
 
 // cargar configuracion (de api key)
 
@@ -96,6 +97,26 @@ app.post("/api/chatbot", async (req, res) => {
 
      // Devolver respuesta 
 
+});
+
+app.post('/api/llama', async (req, res) => {
+    const { message } = req?.body;
+
+    const messages = [
+        {
+            role: 'system',
+            content: contexto
+        },
+        { role: 'user', content: message }
+    ];
+
+
+    const response = await ollama.chat({
+        model: 'llama3.2',
+        messages
+    });
+
+    return res.status(200).json({reply: response?.message?.content});
 });
 
 
