@@ -1,8 +1,8 @@
 from typing import List, Optional, Dict
 import os
 from langchain.docstore.document import Document
-from langchain.vectorstores import (
-    Chroma,
+from langchain_chroma import Chroma
+from langchain_community.vectorstores import (
     Pinecone,
     Weaviate,
     Qdrant
@@ -12,6 +12,10 @@ import pinecone
 import weaviate
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams
+from pinecone import Pinecone as PineconeClient
+from weaviate import Client as WeaviateClient
+from weaviate.auth import AuthApiKey
+from weaviate.connect import ConnectionParams
 
 class VectorStoreType:
     CHROMA = "chroma"
@@ -37,39 +41,32 @@ class VectorStoreManager:
     def init_pinecone(self, index_name: str):
         """Initialize Pinecone"""
         api_key = os.getenv('PINECONE_API_KEY')
-        environment = os.getenv('PINECONE_ENVIRONMENT')
+        if not api_key:
+            raise ValueError("Pinecone API key must be set in .env")
         
-        if not api_key or not environment:
-            raise ValueError("Pinecone API key and environment must be set in .env")
-        
-        pinecone.init(api_key=api_key, environment=environment)
-        
-        # Create index if it doesn't exist
-        if index_name not in pinecone.list_indexes():
-            pinecone.create_index(
-                name=index_name,
-                dimension=1536,  # OpenAI embeddings dimension
-                metric='cosine'
-            )
-        
-        self.vector_store = Pinecone.from_existing_index(
-            index_name=index_name,
-            embedding=self.embeddings
+        pc = pinecone.Pinecone(api_key=api_key)
+        index = pc.Index(index_name)
+        # Create index if it doesn't exist - but for simplicity, assume it exists or handle creation
+        self.vector_store = Pinecone(
+            index=index,
+            embedding=self.embeddings,
+            text_key="text"
         )
         self.store_type = VectorStoreType.PINECONE
         return self.vector_store
 
     def init_weaviate(self, url: str, index_name: str):
         """Initialize Weaviate"""
-        auth_config = None
-        if os.getenv('WEAVIATE_API_KEY'):
-            auth_config = weaviate.auth.AuthApiKey(api_key=os.getenv('WEAVIATE_API_KEY'))
+        api_key = os.getenv('WEAVIATE_API_KEY')
+        if api_key:
+            auth_config = AuthApiKey(api_key=api_key)
+        else:
+            auth_config = None
         
-        client = weaviate.Client(
-            url=url,
+        client = WeaviateClient(
+            connection_params=ConnectionParams.from_url(url, grpc_port=50051),
             auth_client_secret=auth_config
         )
-        
         self.vector_store = Weaviate(
             client=client,
             index_name=index_name,
@@ -101,7 +98,7 @@ class VectorStoreManager:
         self.vector_store = Qdrant(
             client=client,
             collection_name=collection_name,
-            embedding_function=self.embeddings
+            embeddings=self.embeddings
         )
         self.store_type = VectorStoreType.QDRANT
         return self.vector_store

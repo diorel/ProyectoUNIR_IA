@@ -2,7 +2,7 @@ import os
 from typing import List, Union
 import boto3
 from botocore.exceptions import ClientError
-from langchain.document_loaders import (
+from langchain_community.document_loaders import (
     DirectoryLoader,
     S3FileLoader,
     UnstructuredFileLoader,
@@ -27,18 +27,20 @@ class DocumentManager:
     def _init_s3_client(self):
         """Initialize S3 client if not already initialized"""
         if not self.s3_client:
+            aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
+            aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+            aws_region = os.getenv('AWS_REGION', 'us-east-1')
+            if not aws_access_key_id or not aws_secret_access_key:
+                raise ValueError("AWS credentials must be set in .env for S3 access")
             self.s3_client = boto3.client(
                 's3',
-                aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-                aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
-                region_name=os.getenv('AWS_REGION', 'us-east-1')
+                aws_access_key_id=aws_access_key_id,
+                aws_secret_access_key=aws_secret_access_key,
+                region_name=aws_region
             )
 
-    def _get_file_loader(self, file_path: str, source: str = DocumentSource.LOCAL) -> UnstructuredFileLoader:
+    def _get_file_loader(self, file_path: str, source: str = DocumentSource.LOCAL) -> Union[UnstructuredFileLoader, PDFMinerLoader, TextLoader]:
         """Get appropriate loader based on file extension"""
-        if source == DocumentSource.S3:
-            return S3FileLoader(file_path)
-        
         ext = os.path.splitext(file_path)[1].lower()
         if ext == '.pdf':
             return PDFMinerLoader(file_path)
@@ -64,6 +66,8 @@ class DocumentManager:
     def load_from_s3(self, bucket: str, prefix: str = "") -> List[Document]:
         """Load documents from S3 bucket"""
         self._init_s3_client()
+        if self.s3_client is None:
+            raise ValueError("Failed to initialize S3 client")
         documents = []
 
         try:
@@ -106,10 +110,16 @@ class DocumentManager:
                 For S3: bucket and prefix
         """
         if source == DocumentSource.LOCAL:
-            return self.load_from_local(kwargs.get('directory_path'))
+            directory_path = kwargs.get('directory_path')
+            if not directory_path:
+                raise ValueError('directory_path is required for LOCAL source')
+            return self.load_from_local(directory_path)
         elif source == DocumentSource.S3:
+            bucket = kwargs.get('bucket')
+            if not bucket:
+                raise ValueError('bucket is required for S3 source')
             return self.load_from_s3(
-                kwargs.get('bucket'),
+                bucket,
                 kwargs.get('prefix', '')
             )
         else:

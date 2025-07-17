@@ -50,7 +50,10 @@ cd rag_api
 2. Create and activate a virtual environment:
 ```bash
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# On Unix/Mac:
+source venv/bin/activate
+# On Windows:
+venv\Scripts\activate
 ```
 
 3. Install dependencies:
@@ -137,6 +140,22 @@ curl -X POST "http://localhost:8000/query" \
      -H "Content-Type: application/json" \
      -d '{"question": "your question here"}'
 ```
+
+## Adding Documents
+
+Documents are loaded automatically when the server starts, based on your .env configuration. There is no dynamic upload endpoint; add files statically and restart the server.
+
+### Local Files
+1. Place your documents (PDF, TXT, etc.) in the configured directory (default: `./data`).
+2. Ensure `DOCUMENT_SOURCES` includes "local" in .env.
+3. Restart the server with `python run.py` to load and process the new documents.
+
+### Amazon S3
+1. Upload files to your S3 bucket using AWS CLI (e.g., `aws s3 cp file.pdf s3://your-bucket/path/`).
+2. Ensure `DOCUMENT_SOURCES` includes "s3" and configure AWS credentials/S3 details in .env.
+3. Restart the server with `python run.py` to load from S3.
+
+Note: For dynamic uploads, consider extending the API with a new endpoint.
 
 ## API Reference
 

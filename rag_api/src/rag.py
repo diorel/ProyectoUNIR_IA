@@ -1,5 +1,5 @@
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.llms import OpenAI
+from langchain_openai import OpenAIEmbeddings
+from langchain_openai import OpenAI
 from langchain.chains import RetrievalQA
 import os
 from .document_loader import DocumentManager, DocumentSource
