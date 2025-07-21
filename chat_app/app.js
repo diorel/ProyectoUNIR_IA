@@ -1,106 +1,84 @@
-// Importar dependecias
+// Importar dependencias
 import express from 'express';
 import dotenv from 'dotenv';
-import OpenAI from 'openai';
+import axios from 'axios'; // Usaremos axios para realizar la petición HTTP
 
-// cargar configuracion (de api key)
-
+// Cargar configuración de variables de entorno
 dotenv.config();
 
-// cargar expressde
+// Inicializar express
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// servir frontend
+// Servir frontend
 app.use("/", express.static("public"));
 
-// Middleware para procesar json
+// Middleware para procesar JSON
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 
-// Instancia de openia y pasar el api key
-
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
-
-// Ruta / endponint / url
-
+// Contexto inicial para el chatbot
 const contexto = `
-Eres un asistente de dudas academicas, Para la escuela UNIR.
-Informacion del negocio:
-    - Ubicacion: Madrid, España
+Eres un asistente de dudas académicas, Para la escuela UNIR.
+Información del negocio:
+    - Ubicación: Madrid, España
     - Horario: Lunes a Viernes de 9:00 a 18:00
-    - Carreras: Ingenieria Informatica, Administracion de Empresas, Psicologia, Derecho , Medicina
-    - Papeles importantes: acta de nacimiento, certificado de estudios, identificacion oficial
-    - Costos de inscripcion: 100
-    - costo semestre: 5000,
+    - Carreras: Ingeniería Informática, Administración de Empresas, Psicología, Derecho, Medicina
+    - Papeles importantes: acta de nacimiento, certificado de estudios, identificación oficial
+    - Costos de inscripción: 100
+    - Costo semestre: 5000
     - Costo mensualidad: 1000
-    - Pagos: efectivo, tarjeta de credito, transferencia bancaria
+    - Pagos: efectivo, tarjeta de crédito, transferencia bancaria
 Solo puedes preguntar preguntas relacionadas con la escuela UNIR, no puedes hacer preguntas sobre otros temas.
 `;
 
-let contversations = {}; 
+let conversations = {};
 
+// Endpoint para manejar las solicitudes del chatbot
 app.post("/api/chatbot", async (req, res) => {
+    const { userId, message } = req.body;
 
+    // Validar que el mensaje no esté vacío
+    if (!message) {
+        return res.status(400).json({ error: "Has mandado un mensaje vacío!!" });
+    }
 
-
-     // Recibir pregunta del usuario
-
-     const { userId, message } = req.body;
-
-     if(!contversations[userId]){
-        contversations[userId] = [
-            {role: "system", content: contexto},
-            {role: "user", content: "Debes de responder de la forma mas corta posible, Usando los minimos tokens posibles"},
+    // Inicializar la conversación si no existe
+    if (!conversations[userId]) {
+        conversations[userId] = [
+            { role: "system", content: contexto },
+            { role: "user", content: "Debes de responder de la forma más corta posible, usando los mínimos tokens posibles" },
         ];
-     }
+    }
 
-     contversations[userId].push({role: "user", content: message});
+    // Agregar el mensaje del usuario a la conversación
+    conversations[userId].push({ role: "user", content: message });
 
-    
-     if(!message) return res.status(400).json({error: "Has mandado un mensaje vacio!!"});
-
-     // Peticion al modelo de inteligancia artificial
-
-     try{
-
-        const response = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
-            messages: contversations[userId],
-            max_tokens: 200
+    try {
+        // Petición a la API externa
+        const response = await axios.post("http://localhost:8000/query", {
+            question: message,
         });
 
-        // Devolver respuesta   
-        const reply = response.choices[0].message.content;
+        // Obtener la respuesta de la API
+        const reply = response.data.response || "No se pudo obtener una respuesta.";
 
+        // Agregar la respuesta del asistente a la conversación
+        conversations[userId].push({ role: "assistant", content: reply });
 
-        // AÑADIR AL ASISTENTE LA RESPUESTA
-        contversations[userId].push({role: "assistant", content: reply});
-
-        //Limitar numero de mensajes
-        if(contversations[userId].length > 10) {
-            contversations[userId] = contversations[userId].slice(-10);
+        // Limitar el número de mensajes en la conversación
+        if (conversations[userId].length > 10) {
+            conversations[userId] = conversations[userId].slice(-10);
         }
-        
-        return res.status(200).json({reply});
 
-
-     }catch (error) {
-        console.error("Error:", error);
-        
-        return res.status(500).json({error: "Error al procesar la solicitud"});
-     }
-
-
-     // Devolver respuesta 
-
+        return res.status(200).json({ reply });
+    } catch (error) {
+        console.error("Error:", error.message);
+        return res.status(500).json({ error: "Error al procesar la solicitud" });
+    }
 });
 
-
-
-// Servir el Backend
+// Iniciar el servidor
 app.listen(PORT, () => {
-    console.log("Server is running on port" + PORT);
+    console.log("Server is running on port " + PORT);
 });
