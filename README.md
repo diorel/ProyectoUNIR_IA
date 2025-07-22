@@ -1,39 +1,58 @@
-# Chat de Dudas Académicas - UNIR
+# UNIR AI Project
 
-Este proyecto es un chat diseñado para resolver dudas académicas entre estudiantes y tutores de UNIR, facilitando la comunicación en tiempo real.
+This repository contains a collection of AI-powered applications developed as part of the UNIR Master's program in Artificial Intelligence. The project demonstrates the implementation of various AI technologies and architectures.
 
-## 📦 Instalación
+## Project Structure
 
-Para instalar las dependencias del proyecto, ejecuta el siguiente comando:
+The repository is organized into the following main components:
 
-```bash
-npm install
-```
+### RAG API (`/rag_api`)
 
-Ve a la siguiente pagina y descarga ollama: `https://ollama.com/download/windows`
+A Retrieval Augmented Generation (RAG) system that enhances Large Language Model responses by grounding them in specific document collections. This implementation supports:
 
-ejecuta:
+- Multiple vector stores (ChromaDB, Pinecone, Weaviate, Qdrant)
+- Document loading from local and S3 sources
+- Environment-based configuration
+- RESTful API interface
 
-```bash
-ollama run llama3.2
-```
+[Learn more about the RAG API](./rag_api/README.md)
 
-Es necesario crear un archivo .env, puedes usar el .env.template
+### Chat Application (`/chat_app`)
 
-despues puedes correr la app con:
+A web-based chat interface that demonstrates:
 
-```bash
-node app.js
-```
+- Real-time communication
+- Modern UI/UX design
+- Integration with AI services
+- Responsive layout
 
-ve a la pagina:
+[Learn more about the Chat Application](./chat_app/README.md)
 
-```
-http://localhost:3000/
-```
+## Getting Started
 
-para usar ollama agrega el query param `?llm=llama`
+Each component has its own setup instructions and requirements. Please refer to the individual README files in each directory for specific setup and usage instructions.
 
-```
- http://localhost:3000/?llm=llama
-```
+## Development
+
+The project uses modern development practices and tools:
+
+- Git for version control
+- Environment-based configuration
+- Modular architecture
+- Comprehensive documentation
+
+## License
+
+This project is licensed under the MIT License - see the individual component directories for specific license information.
+
+## Authors
+
+- Raul Diorelyon Cortes
+- Carlos Eduardo Ramirez
+- Juan Pablo Corona
+
+## Acknowledgments
+
+- UNIR Master's Program in Artificial Intelligence
+- OpenAI for API services
+- Various open-source projects and their contributors

@@ -2,8 +2,7 @@ const sendButton = document.querySelector('#sendButton');
 const inputElement = document.querySelector('#inputText');
 const messagesContainer = document.querySelector('.chat__messages');
 const userId = Date.now() + Math.random(777 + Math.random() * 7000);
-const queryParams = window.location.search;
-const urlParams = new URLSearchParams(queryParams);
+const urlParams = new URLSearchParams(window?.location?.search);
 
 const llamaApi = async (message) => {
     try {
@@ -16,7 +15,6 @@ const llamaApi = async (message) => {
             })
         });
         const data = await response.json();
-
         return data;
     } catch (error) {
         throw new Error(`There has been an error with the api: ${error}`);
@@ -41,28 +39,52 @@ const chatGPTApi = async (message) => {
 }
 
 const sendMessage = async () => {
-    const inputText = inputElement.value.trim();
     let llmResponse = '';
+    const inputText = inputElement.value.trim();
 
     if (!inputText) return false;
 
+    // Agregar mensaje del usuario al chat
     messagesContainer.innerHTML += `<div class="chat__message chat__message--user">Yo: ${inputText}</div>`;
+
+    // Vaciar el input del usuario
     inputElement.value = '';
+
+    // Mostrar animación de carga
+    const loadingMessage = document.createElement('div');
+    loadingMessage.classList.add('chat__message', 'chat__message--loading');
+    loadingMessage.innerHTML = 'Carmen está escribiendo...';
+    messagesContainer.appendChild(loadingMessage);
+
+    // Mover el scroll hacia abajo
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-    if (urlParams.get('llm') === 'llama') {
-        llmResponse = await llamaApi(inputText);
-    } else {
-        llmResponse = await chatGPTApi(inputText);
-    }
+    try {
+        // Petición al backend para obtener la respuesta
+        if (urlParams.get('llm') === 'llama') {
+            llmResponse = await llamaApi(inputText);
+        } else {
+            llmResponse = await chatGPTApi(inputText);
+        }
 
-    if (llmResponse) {
+        // Eliminar animación de carga
+        loadingMessage.remove();
+
+        // Mostrar respuesta del bot
         messagesContainer.innerHTML += `<div class="chat__message chat__message--bot">Carmen: ${llmResponse?.reply}</div>`;
+    } catch (error) {
+        console.error(error);
+
+        // Eliminar animación de carga
+        loadingMessage.remove();
+
+        // Mostrar mensaje de error
+        messagesContainer.innerHTML += `<div class="chat__message chat__message--bot">Carmen: Hubo un error al procesar tu solicitud.</div>`;
     }
 
     // Mover el scroll hacia abajo
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
+};
 
 sendButton.addEventListener('click', sendMessage);
 inputElement.addEventListener('keypress', (event) => {

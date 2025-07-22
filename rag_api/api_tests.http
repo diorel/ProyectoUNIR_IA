@@ -1,0 +1,23 @@
+### Prueba básica de query
+POST http://localhost:8000/query
+Content-Type: application/json
+
+{
+    "question": "¿Qué es un sistema RAG?"
+}
+
+### Prueba con pregunta vacía (para verificar manejo de errores)
+POST http://localhost:8000/query
+Content-Type: application/json
+
+{
+    "question": ""
+}
+
+### Prueba con pregunta larga
+POST http://localhost:8000/query
+Content-Type: application/json
+
+{
+    "question": "Explica en detalle cómo funciona el proceso de retrieval en un sistema RAG, incluyendo embeddings y vector stores."
+} 
