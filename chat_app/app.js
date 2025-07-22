@@ -2,6 +2,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import axios from 'axios'; // Usaremos axios para realizar la petición HTTP
+import ollama from 'ollama';
 
 // Cargar configuración de variables de entorno
 dotenv.config();
@@ -76,6 +77,26 @@ app.post("/api/chatbot", async (req, res) => {
         console.error("Error:", error.message);
         return res.status(500).json({ error: "Error al procesar la solicitud" });
     }
+});
+
+app.post('/api/llama', async (req, res) => {
+    const { message } = req?.body;
+
+    const messages = [
+        {
+            role: 'system',
+            content: contexto
+        },
+        { role: 'user', content: message }
+    ];
+
+
+    const response = await ollama.chat({
+        model: 'llama3.2',
+        messages
+    });
+
+    return res.status(200).json({reply: response?.message?.content});
 });
 
 // Iniciar el servidor
