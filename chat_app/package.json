@@ -15,7 +15,6 @@
     "axios": "^1.8.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "ollama": "^0.5.16",
     "openai": "^4.85.4"
   },
   "devDependencies": {
