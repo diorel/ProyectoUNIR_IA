@@ -78,6 +78,18 @@ app.post("/api/chatbot", async (req, res) => {
     }
 });
 
+app.post('/api/llama', async (req, res) => {
+    const { message } = req?.body;
+
+    if (!message) return res.status(200).json({reply: 'you sent an empty question'});
+
+    const response = await axios.post(process.env.OLLAMASERVER, {
+        message: req?.body?.message,
+    });
+
+    return res.status(200).json({reply: response?.data?.reply});
+});
+
 // Iniciar el servidor
 app.listen(PORT, () => {
     console.log("Server is running on port " + PORT);
