@@ -22,16 +22,26 @@
 
   <section class="chat">
 
-    <div class="chat__messages">
-        <! --Carga los mensajes del chat -->
+    <div class="chat__messages__container">
+        <div class="chat__messages">
+            <! --Carga los mensajes del chat -->
+        </div>
     </div>
 
     <div class="chat__input-group">
-        <input type="text" id="inputText" class="chat__input" placeholder="¿En que te puedo ayudar?" />
-        
-        
+        <div class="chat__input__suggested__questions">
+            <ul class="chat__input__suggested__questions__list" id="quick_questions_list">
+                <li>Donde esta la escuela?</li>
+                <li>Cual es el costo?</li>
+                <li>Que licenciaturas tienen?</li>
+                <li>Que maestrias tienen?</li>
+                <li>Cuando son los examenes?</li>
+            </ul>
+        </div>
+        <div class="chat__input--textbox">
+            <input type="text" id="inputText" class="chat__input" placeholder="¿En que te puedo ayudar?" />
             <button class="chat__button" id="sendButton">Enviar</button>
-       
+        </div>
     </div>
   </section>    
 </body>
