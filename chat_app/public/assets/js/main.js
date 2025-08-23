@@ -1,5 +1,6 @@
 const sendButton = document.querySelector('#sendButton');
 const inputElement = document.querySelector('#inputText');
+const quickQuestionList = document.getElementById('quick_questions_list');
 const messagesContainer = document.querySelector('.chat__messages');
 const userId = Date.now() + Math.random(777 + Math.random() * 7000);
 
@@ -62,4 +63,10 @@ inputElement.addEventListener('keypress', (event) => {
     }
 });
 
+quickQuestionList.addEventListener('click', function(evt){
+    if(evt?.target?.tagName === 'LI') {
+        inputElement.value = evt?.target?.textContent;
+        sendMessage();
+    }
+});
 

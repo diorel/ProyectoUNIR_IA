@@ -54,9 +54,12 @@ body {
     border-radius: 12px;
     border: 1px solid var(--border);
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
-    padding: 1.5rem;
     display: flex;
     flex-direction: column;
+}
+
+.chat__messages__container{
+    overflow: hidden;
 }
 
 .chat__messages {
@@ -71,6 +74,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
+    max-height: 405px;
+    overflow-y: auto;
 }
 
 /* Manteniendo las clases originales pero con nuevos estilos */
@@ -102,6 +107,14 @@ body {
     display: flex;
     gap: 0.8rem;
     margin-top: auto;
+    flex-wrap: wrap;
+}
+
+.chat__input--textbox {
+    display: flex;
+    width: 100%;
+    gap: 20px;
+    padding: 0 1.5rem 1.5rem 1.5rem ;
 }
 
 .chat__input {
@@ -113,6 +126,35 @@ body {
     border-radius: 8px;
     font-size: 1rem;
     transition: all 0.3s ease;
+}
+
+.chat__input__suggested__questions {
+    flex: 0 0 100%;
+    border-top: 1px solid #868686;
+    border-bottom: 1px solid #868686;
+}
+
+.chat__input__suggested__questions__list {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.chat__input__suggested__questions__list > li {
+    display: inline-block;
+    padding: 5px 10px;
+    border: 1px solid #444444;
+    margin: 5px;
+    border-radius: 5px;
+    color: #cccccc;
+    transition: all 0.1s;
+}
+
+.chat__input__suggested__questions__list > li:hover {
+    cursor: pointer;
+    color: #fff;
+    border: 1px solid #cecece;
+    box-shadow: 0 0 2px #fff;
 }
 
 .chat__input:focus {
