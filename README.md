@@ -55,4 +55,4 @@ This project is licensed under the MIT License - see the individual component di
 
 - UNIR Master's Program in Artificial Intelligence
 - OpenAI for API services
-- Various open-source projects and their contributors 
+- Various open-source projects and their contributors

@@ -1,0 +1,3 @@
+/chat_app/node_modules
+/chat_app/.env
+/rag_api/src/__pycache__
